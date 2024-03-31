@@ -1,12 +1,12 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
-    clientId:String,
-    clientname:String,
-    email : String,
-    phone : Number,
-    address : String
-})
+const ClientSchema = new mongoose.Schema({
+    clientId: String,
+    clientName: String, // Corrected field name
+    email: String,
+    phone: String, // Changed to String as phone numbers might include non-numeric characters
+    address: String
+});
 
-const UserModel = mongoose.model("client",UserSchema)
-module.exports = UserModel
+const ClientModel = mongoose.model("Client", ClientSchema); // Changed model name to "User"
+module.exports = ClientModel; // Corrected export statement
