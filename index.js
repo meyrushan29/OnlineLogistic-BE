@@ -1,14 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const ClientModel = require('./models/Client'); // Adjust the path as per your project structure
+const ClientModel = require('./models/Client'); 
 const SupplierModel =require('./models/Supplier');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
- 
 
 // MongoDB connection URI
 const dbURI = "mongodb+srv://meyrushan29:Bookmari20.M@olms.motagl0.mongodb.net/OLMS";
@@ -29,7 +28,7 @@ app.post('/CreateSupplier', (req, res) => {
     .catch(err => res.json(err))
 });
 
-app.get('/',(req,res)=>{
+app.get('/sup',(req,res)=>{
     SupplierModel.find({})
     .then(Supplier => res.json(Supplier))
     .catch(err => res.json(err))
@@ -62,10 +61,6 @@ app.delete('/Deletesupplier/:id',(req,res) => {
     .then(res => res.json(res))
     .catch(err => res.json(err))
 })
-
-
-
-
 
 app.get('/',(req,res)=>{
     ClientModel.find({})
