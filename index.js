@@ -2,10 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const ClientModel = require('./models/Client'); // Adjust the path as per your project structure
+const SupplierModel =require('./models/Supplier');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+ 
 
 // MongoDB connection URI
 const dbURI = "mongodb+srv://meyrushan29:Bookmari20.M@olms.motagl0.mongodb.net/OLMS";
@@ -19,6 +22,49 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
     console.log('Connected to MongoDB database');
 });
+
+app.post('/CreateSupplier', (req, res) => {
+    SupplierModel.create(req.body)
+    .then(Supplier => res.json(Supplier))
+    .catch(err => res.json(err))
+});
+
+app.get('/',(req,res)=>{
+    SupplierModel.find({})
+    .then(Supplier => res.json(Supplier))
+    .catch(err => res.json(err))
+})
+
+app.get('/getSupplier/:id',(req, res) =>{
+    const id = req.params.id;
+    SupplierModel.findById({_id:id})
+    .then(Supplier => res.json(Supplier))
+    .catch(err => res.json(err))
+})
+
+app.put('/UpdateSupplier/:id',(req,res)=>{
+    const id = req.params.id;
+    SupplierModel.findByIdAndUpdate({_id:id},{
+        supplierID:req.body.supplierID,
+        Name:req.body.Name,
+        Email:req.body.Email,
+        PhoneNumber:req.body.PhoneNumber,
+        CompanyName:req.body.CompanyName,
+        OrderID:req.body.OrderID,
+        Country:req.body.Country})
+    .then(Supplier => res.json(Supplier))
+    .catch(err => res.json(err))
+})
+
+app.delete('/Deletesupplier/:id',(req,res) => {
+    const id = req.params.id;
+    SupplierModel.findByIdAndDelete({_id: id})
+    .then(res => res.json(res))
+    .catch(err => res.json(err))
+})
+
+
+
 
 
 app.get('/',(req,res)=>{
