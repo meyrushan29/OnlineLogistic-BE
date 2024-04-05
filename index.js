@@ -95,7 +95,11 @@ app.put('/UpdateClient/:id',(req,res)=>{
         clientName:req.body.clientName,
         email:req.body.email,
         phone:req.body.phone,
-        address:req.body.address})
+        address:req.body.address,
+        gender:req.body.gender,
+        billingAddress:req.body.billingAddress,
+        status:req.body.status
+    })
     .then(Client => res.json(Client))
     .catch(err => res.json(err))
 })
