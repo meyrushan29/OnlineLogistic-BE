@@ -4,6 +4,7 @@ const cors = require('cors');
 const ClientModel = require('./models/Client'); 
 const SupplierModel =require('./models/Supplier');
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -21,6 +22,8 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', () => {
     console.log('Connected to MongoDB database');
 });
+
+// Supplier API
 
 app.post('/CreateSupplier', (req, res) => {
     SupplierModel.create(req.body)
@@ -62,13 +65,20 @@ app.delete('/Deletesupplier/:id',(req,res) => {
     .catch(err => res.json(err))
 })
 
+
+//End Supplier/////////////////////
+
+
+
+
+// Client API//////
+
 app.get('/',(req,res)=>{
     ClientModel.find({})
     .then(Client => res.json(Client))
     .catch(err => res.json(err))
 })
 
-// Example route
 app.post('/CreateClient', (req, res) => {
     ClientModel.create(req.body)
     .then(Client => res.json(Client))
@@ -105,6 +115,12 @@ app.delete('/deleteClient/:id',(req,res)=>{
     .then(res => res.json(res))
     .catch(err => res.json(err))
 })
+
+//////////ENd Client API///////////////
+
+
+
+
 
 // Start the server
 const PORT = process.env.PORT || 3001;
