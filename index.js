@@ -47,23 +47,27 @@ app.get('/getSupplier/:id',(req, res) =>{
 app.put('/UpdateSupplier/:id',(req,res)=>{
     const id = req.params.id;
     SupplierModel.findByIdAndUpdate({_id:id},{
-        supplierID:req.body.supplierID,
+        SupplierID:req.body.SupplierID,
         Name:req.body.Name,
         Email:req.body.Email,
         PhoneNumber:req.body.PhoneNumber,
         CompanyName:req.body.CompanyName,
         OrderID:req.body.OrderID,
-        Country:req.body.Country})
+        Country:req.body.Country,
+        Status:req.body.Status,
+        Category:req.body.Category,
+       })
     .then(Supplier => res.json(Supplier))
     .catch(err => res.json(err))
 })
 
-app.delete('/Deletesupplier/:id',(req,res) => {
-    const id = req.params.id;
-    SupplierModel.findByIdAndDelete({_id: id})
-    .then(res => res.json(res))
-    .catch(err => res.json(err))
-})
+app.delete('/Deletesupplier', (req, res) => {
+    const ids = req.body.ids;
+    SupplierModel.deleteMany({ _id: { $in: ids } })
+        .then(() => res.json({ message: 'Suppliers deleted successfully' }))
+        .catch(err => res.status(500).json({ error: err.message }));
+});
+
 
 
 //End Supplier/////////////////////
