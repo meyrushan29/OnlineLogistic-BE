@@ -83,10 +83,19 @@ app.get('/',(req,res)=>{
     .catch(err => res.json(err))
 })
 
-app.post('/CreateClient', (req, res) => {
-    ClientModel.create(req.body)
-    .then(Client => res.json(Client))
-    .catch(err => res.json(err))
+app.post('/CreateClient', async (req, res) => {
+    try {
+        const existingClient = await ClientModel.findOne({ clientId: req.body.clientId });
+        
+        if (existingClient) {
+            return res.status(400).json({ message: 'Client ID already exists' });
+        }
+
+        const newClient = await ClientModel.create(req.body);
+        res.json(newClient);
+    } catch (err) {
+        res.status(500).json({ message: 'Error creating client', error: err });
+    }
 });
 
 app.get('/getClient/:id',(req,res)=>{
