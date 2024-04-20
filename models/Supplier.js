@@ -6,7 +6,6 @@ const SupplierSchema = new mongoose.Schema({
     PhoneNumber: String,
     Email: String,
     CompanyName: String,
-    OrderID: { type: String, unique: true }, // Ensure OrderID is unique
     Country: String,
     Status: String,
     Category: String, // New field for Supplier Category
