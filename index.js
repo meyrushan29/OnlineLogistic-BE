@@ -25,10 +25,19 @@ db.once('open', () => {
 
 // Supplier API
 
-app.post('/CreateSupplier', (req, res) => {
-    SupplierModel.create(req.body)
-    .then(Supplier => res.json(Supplier))
-    .catch(err => res.json(err))
+app.post('/CreateSupplier', async (req, res) => {
+    try {
+        const existingSupplier = await SupplierModel.findOne({ SupplierID: req.body.SupplierID });
+        
+        if (existingSupplier) {
+            return res.status(400).json({ message: 'Supplier ID already exists' });
+        }
+
+        const newSupplier = await SupplierModel.create(req.body);
+        res.json(newSupplier);
+    } catch (err) {
+        res.status(500).json({ message: 'Error creating client', error: err });
+    }
 });
 
 app.get('/sup',(req,res)=>{
