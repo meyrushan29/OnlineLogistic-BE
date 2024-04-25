@@ -1,10 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const ClientModel = require('./models/Client');
-const CustomersupportModel = require('./models/Customersupport');
+const ClientModel = require('./models/Client'); 
+const SupplierModel = require('./models/Supplier');
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
@@ -12,92 +13,137 @@ app.use(express.json());
 const dbURI = "mongodb+srv://meyrushan29:Bookmari20.M@olms.motagl0.mongodb.net/OLMS";
 
 // Connect to MongoDB
-mongoose.connect(dbURI);
+// Connect to MongoDB
+mongoose.connect(dbURI)
+    .then(() => console.log('Connected to MongoDB database'))
+    .catch(err => console.error('Connection error:', err));
 
-// Event handlers for MongoDB connection
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB database');
+
+// Supplier API
+
+app.post('/CreateSupplier', async (req, res) => {
+    try {
+        const existingSupplier = await SupplierModel.findOne({ SupplierID: req.body.SupplierID });
+        
+        if (existingSupplier) {
+            return res.status(400).json({ message: 'Supplier ID already exists' });
+        }
+
+        const newSupplier = await SupplierModel.create(req.body);
+        res.json(newSupplier);
+    } catch (err) {
+        res.status(500).json({ message: 'Error creating supplier', error: err.message });
+    }
 });
 
-app.get('/', (req, res) => {
-    ClientModel.find({})
-        .then(Client => res.json(Client))
-        .catch(err => res.json(err))
+app.get('/sup', async (req, res) => {
+    try {
+        const suppliers = await SupplierModel.find({});
+        res.json(suppliers);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching suppliers', error: err.message });
+    }
 });
 
-app.post('/CreateClient', (req, res) => {
-    ClientModel.create(req.body)
-        .then(Client => res.json(Client))
-        .catch(err => res.json(err))
+app.get('/getSupplier/:id', async (req, res) => {
+    try {
+        const supplier = await SupplierModel.findById(req.params.id);
+        res.json(supplier);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching supplier', error: err.message });
+    }
 });
 
-app.get('/getClient/:id', (req, res) => {
-    const id = req.params.id;
-    ClientModel.findById({_id: id})
-        .then(Client => res.json(Client))
-        .catch(err => res.json(err))
+app.put('/UpdateSupplier/:id', async (req, res) => {
+    try {
+        const updatedSupplier = await SupplierModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedSupplier);
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating supplier', error: err.message });
+    }
 });
 
-app.put('/UpdateClient/:id', (req, res) => {
-    const id = req.params.id;
-    ClientModel.findByIdAndUpdate({_id: id}, {
-        clientId: req.body.clientid,
-        clientName: req.body.clientName,
-        email: req.body.email,
-        phone: req.body.phone,
-        address: req.body.address
-    })
-        .then(Client => res.json(Client))
-        .catch(err => res.json(err))
+app.delete('/Deletesupplier', async (req, res) => {
+    try {
+        const { ids } = req.body;
+        await SupplierModel.deleteMany({ _id: { $in: ids } });
+        res.json({ message: 'Suppliers deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting suppliers', error: err.message });
+    }
 });
 
-app.delete('/deleteClient/:id', (req, res) => {
-    const id = req.params.id;
-    ClientModel.findByIdAndDelete({_id: id})
-        .then(result => res.json(result))
-        .catch(err => res.json(err))
+// Client API
+
+app.get('/', async (req, res) => {
+    try {
+        const clients = await ClientModel.find({});
+        res.json(clients);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching clients', error: err.message });
+    }
 });
 
-app.get('/cus', (req, res) => {
-    CustomersupportModel.find({})
-        .then(Customersupport => res.json(Customersupport))
-        .catch(err => res.json(err))
+app.post('/CreateClient', async (req, res) => {
+    try {
+        const existingClient = await ClientModel.findOne({ clientId: req.body.clientId });
+        
+        if (existingClient) {
+            return res.status(400).json({ message: 'Client ID already exists' });
+        }
+
+        const newClient = await ClientModel.create(req.body);
+        res.json(newClient);
+    } catch (err) {
+        res.status(500).json({ message: 'Error creating client', error: err.message });
+    }
 });
 
-
-app.post("/CreateTicket", (req, res) => {
-    CustomersupportModel.create(req.body)
-        .then(Customersupport => res.json(Customersupport))
-        .catch(err => res.json(err))
+app.get('/getClient/:id', async (req, res) => {
+    try {
+        const client = await ClientModel.findById(req.params.id);
+        res.json(client);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching client', error: err.message });
+    }
 });
 
-app.get('/getTicket/:id', (req, res) => {
-    const id = req.params.id;
-    CustomersupportModel.findById({_id: id})
-        .then(Customersupport => res.json(Customersupport))
-        .catch(err => res.json(err))
+app.put('/UpdateClient/:id', async (req, res) => {
+    try {
+        const updatedClient = await ClientModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.json(updatedClient);
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating client', error: err.message });
+    }
 });
 
-app.put('/UpdateTicket/:id', (req, res) => {
-    const id = req.params.id;
-    CustomersupportModel.findByIdAndUpdate({_id: id}, {
-        ticketId: req.body.ticketId,
-        email:req.body.email,
-        title: req.body.title,
-        description: req.body.description,
-        status: req.body.status
-    })
-        .then(Customersupport => res.json(Customersupport))
-        .catch(err => res.json(err))
+app.delete('/deleteClient/:id', async (req, res) => {
+    try {
+        await ClientModel.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Client deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting client', error: err.message });
+    }
 });
 
-app.delete('/deleteTicket/:id', (req, res) => {
-    const id = req.params.id;
-    CustomersupportModel.findByIdAndDelete({_id: id})
-        .then(result => res.json(result))
-        .catch(err => res.json(err))
+// Dashboard API
+
+app.get('/api/admindashboard/clientcount', async (req, res) => {
+    try {
+        const clientCount = await ClientModel.countDocuments();
+        res.json({ count: clientCount });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching client count', error: error.message });
+    }
+});
+
+app.get('/api/admindashboard/suppliercount', async (req, res) => {
+    try {
+        const supplierCount = await SupplierModel.countDocuments();
+        res.json({ count: supplierCount });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching supplier count', error: error.message });
+    }
 });
 
 // Start the server
