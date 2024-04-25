@@ -14,7 +14,7 @@ const jwt = require('jsonwebtoken')
 const app = express();
 app.use(cors({
     origin:["http://localhost:3000"],
-    methods:["GET","POST"],
+    methods:["GET","POST","DELETE","PUT"],
     credentials:true
 }));
 app.use(express.json());
@@ -69,17 +69,10 @@ app.post('/login', (req,res)=>{
 })
 
 
-//CustomerSupport
+//CustomerSupport API -------------------------------------------------------------------------------------------------------------------
 
 app.post("/CreateTicket", (req, res) => {
     CustomersupportModel.create(req.body)
-        .then(Customersupport => res.json(Customersupport))
-        .catch(err => res.json(err))
-});
-
-app.get('/getTicket/:id', (req, res) => {
-    const id = req.params.id;
-    CustomersupportModel.findById({_id: id})
         .then(Customersupport => res.json(Customersupport))
         .catch(err => res.json(err))
 });
@@ -90,6 +83,12 @@ app.get('/cus', async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: 'Error fetching suppliers', error: err.message });
     }
+});
+app.get('/getTicket/:id', (req, res) => {
+    const id = req.params.id;
+    CustomersupportModel.findById({_id: id})
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
 });
 
 app.put('/UpdateTicket/:id', (req, res) => {
@@ -109,10 +108,10 @@ app.delete('/deleteTicket/:id', (req, res) => {
     const id = req.params.id;
     CustomersupportModel.findByIdAndDelete({_id: id})
         .then(result => res.json(result))
-        .catch(err => res.json(err)); // Add a closing parenthesis here
-});
+        .catch(err => res.json(err))
+    });
 
-// Supplier API
+// Supplier API------------------------------------------------------------------------
 
 app.post('/CreateSupplier', async (req, res) => {
     try {
@@ -166,7 +165,8 @@ app.delete('/Deletesupplier', async (req, res) => {
     }
 });
 
-// Client API
+
+// Client API --------------------------------------------------------------------------------------------------------------------
 
 app.get('/', async (req, res) => {
     try {
@@ -219,7 +219,7 @@ app.delete('/deleteClient/:id', async (req, res) => {
     }
 });
 
-// Dashboard API
+// Dashboard API ------------------------------------------------------------------------------------------------------------------------
 
 app.get('/api/admindashboard/clientcount', async (req, res) => {
     try {
@@ -240,7 +240,7 @@ app.get('/api/admindashboard/suppliercount', async (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
