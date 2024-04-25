@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const ClientModel = require('./models/Client'); // Adjust the path as per your project structure
+const ClientModel = require('./models/Client');
+const CustomersupportModel = require('./models/Customersupport');
 
 const app = express();
 app.use(cors());
@@ -20,46 +21,84 @@ db.once('open', () => {
     console.log('Connected to MongoDB database');
 });
 
-
-app.get('/',(req,res)=>{
+app.get('/', (req, res) => {
     ClientModel.find({})
-    .then(Client => res.json(Client))
-    .catch(err => res.json(err))
-})
-
-// Example route
-app.post('/CreateClient', (req, res) => {
-    ClientModel.create(req.body)
-    .then(Client => res.json(Client))
-    .catch(err => res.json(err))
+        .then(Client => res.json(Client))
+        .catch(err => res.json(err))
 });
 
-app.get('/getClient/:id',(req,res)=>{
+app.post('/CreateClient', (req, res) => {
+    ClientModel.create(req.body)
+        .then(Client => res.json(Client))
+        .catch(err => res.json(err))
+});
+
+app.get('/getClient/:id', (req, res) => {
     const id = req.params.id;
-    ClientModel.findById({_id:id})
-    .then(Client => res.json(Client))
-    .catch(err => res.json(err))
-})
+    ClientModel.findById({_id: id})
+        .then(Client => res.json(Client))
+        .catch(err => res.json(err))
+});
+
+app.put('/UpdateClient/:id', (req, res) => {
+    const id = req.params.id;
+    ClientModel.findByIdAndUpdate({_id: id}, {
+        clientId: req.body.clientid,
+        clientName: req.body.clientName,
+        email: req.body.email,
+        phone: req.body.phone,
+        address: req.body.address
+    })
+        .then(Client => res.json(Client))
+        .catch(err => res.json(err))
+});
+
+app.delete('/deleteClient/:id', (req, res) => {
+    const id = req.params.id;
+    ClientModel.findByIdAndDelete({_id: id})
+        .then(result => res.json(result))
+        .catch(err => res.json(err))
+});
+
+app.get('/cus', (req, res) => {
+    CustomersupportModel.find({})
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
+});
 
 
-app.put('/UpdateClient/:id',(req,res)=>{
+app.post("/CreateTicket", (req, res) => {
+    CustomersupportModel.create(req.body)
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
+});
+
+app.get('/getTicket/:id', (req, res) => {
     const id = req.params.id;
-    ClientModel.findByIdAndUpdate({_id:id},{
-        clientId:req.body.clientid,
-        clientName:req.body.clientName,
+    CustomersupportModel.findById({_id: id})
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
+});
+
+app.put('/UpdateTicket/:id', (req, res) => {
+    const id = req.params.id;
+    CustomersupportModel.findByIdAndUpdate({_id: id}, {
+        ticketId: req.body.ticketId,
         email:req.body.email,
-        phone:req.body.phone,
-        address:req.body.address})
-    .then(Client => res.json(Client))
-    .catch(err => res.json(err))
-})
+        title: req.body.title,
+        description: req.body.description,
+        status: req.body.status
+    })
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
+});
 
-app.delete('/deleteClient/:id',(req,res)=>{
+app.delete('/deleteTicket/:id', (req, res) => {
     const id = req.params.id;
-    ClientModel.findByIdAndDelete({_id:id})
-    .then(res => res.json(res))
-    .catch(err => res.json(err))
-})
+    CustomersupportModel.findByIdAndDelete({_id: id})
+        .then(result => res.json(result))
+        .catch(err => res.json(err))
+});
 
 // Start the server
 const PORT = process.env.PORT || 3001;
