@@ -83,6 +83,14 @@ app.get('/getTicket/:id', (req, res) => {
         .then(Customersupport => res.json(Customersupport))
         .catch(err => res.json(err))
 });
+app.get('/cus', async (req, res) => {
+    try {
+        const Customersupport = await CustomersupportModel.find({});
+        res.json(Customersupport);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching suppliers', error: err.message });
+    }
+});
 
 app.put('/UpdateTicket/:id', (req, res) => {
     const id = req.params.id;
