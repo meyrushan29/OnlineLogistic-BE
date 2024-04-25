@@ -3,11 +3,22 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const ClientModel = require('./models/Client'); 
 const SupplierModel = require('./models/Supplier');
+const CustomersupportModel = require('./models/Customersupport');
+const { cookie } = require('express-validator');
+const UserModel = require('./models/Users')
+const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
+
 
 const app = express();
-
-app.use(cors());
+app.use(cors({
+    origin:["http://localhost:3000"],
+    methods:["GET","POST"],
+    credentials:true
+}));
 app.use(express.json());
+//app.use(cookieParser());
 
 // MongoDB connection URI
 const dbURI = "mongodb+srv://meyrushan29:Bookmari20.M@olms.motagl0.mongodb.net/OLMS";
@@ -18,6 +29,80 @@ mongoose.connect(dbURI)
     .then(() => console.log('Connected to MongoDB database'))
     .catch(err => console.error('Connection error:', err));
 
+
+// Register
+
+app.post('/register',(req,res)=>{
+    const {name ,email , password} = req.body;
+    bcrypt.hash(password,10)
+    .then(hash =>{
+        UserModel.create({name,email,password:hash})
+        .then(user => res.json({status:"Success"}))
+        .catch(err => res.json(err))
+    }).catch(err => res.json(err))
+})
+
+
+//Login
+
+
+app.post('/login', (req,res)=>{
+    const {email,password} = req.body;
+    UserModel.findOne({email:email})
+    .then(user => {
+        if(user){
+            bcrypt.compare(password,user.password,(err,response)=>{
+                if(response){
+                    const token = jwt.sign({email: user.email}, 'your-secret-key', { expiresIn: '1h' });
+                    res.cookie('token',token)
+                    return res.json({Status:"Sucess"}
+                    )
+                }else {
+                    return res.json("The password is Incorrect");
+                }
+            })
+
+        } else {
+            return res.json("No records Existed")
+        }
+    })
+})
+
+
+//CustomerSupport
+
+app.post("/CreateTicket", (req, res) => {
+    CustomersupportModel.create(req.body)
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
+});
+
+app.get('/getTicket/:id', (req, res) => {
+    const id = req.params.id;
+    CustomersupportModel.findById({_id: id})
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
+});
+
+app.put('/UpdateTicket/:id', (req, res) => {
+    const id = req.params.id;
+    CustomersupportModel.findByIdAndUpdate({_id: id}, {
+        ticketId: req.body.ticketId,
+        email:req.body.email,
+        title: req.body.title,
+        description: req.body.description,
+        status: req.body.status
+    })
+        .then(Customersupport => res.json(Customersupport))
+        .catch(err => res.json(err))
+});
+
+app.delete('/deleteTicket/:id', (req, res) => {
+    const id = req.params.id;
+    CustomersupportModel.findByIdAndDelete({_id: id})
+        .then(result => res.json(result))
+        .catch(err => res.json(err)); // Add a closing parenthesis here
+});
 
 // Supplier API
 
