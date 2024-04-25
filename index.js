@@ -88,7 +88,7 @@ app.get('/cus', async (req, res) => {
         const Customersupport = await CustomersupportModel.find({});
         res.json(Customersupport);
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching suppliers', error: err.message });
+        res.status(500).json({ message: 'Error fetching tickets', error: err.message });
     }
 });
 
@@ -109,8 +109,9 @@ app.delete('/deleteTicket/:id', (req, res) => {
     const id = req.params.id;
     CustomersupportModel.findByIdAndDelete({_id: id})
         .then(result => res.json(result))
-        .catch(err => res.json(err)); // Add a closing parenthesis here
+        .catch(err => res.json(err)); // Added a closing parenthesis here
 });
+
 
 // Supplier API
 
