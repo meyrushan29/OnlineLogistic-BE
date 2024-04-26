@@ -53,9 +53,9 @@ app.post('/login', (req,res)=>{
         if(user){
             bcrypt.compare(password,user.password,(err,response)=>{
                 if(response){
-                    const token = jwt.sign({email: user.email}, 'your-secret-key', { expiresIn: '1h' });
+                    const token = jwt.sign({email: user.email}, 'your-secret-key', { expiresIn: '1s' });
                     res.cookie('token',token)
-                    return res.json({Status:"Sucess"}
+                    return res.json({Status:"Success"}
                     )
                 }else {
                     return res.json("The password is Incorrect");
@@ -219,6 +219,10 @@ app.delete('/deleteClient/:id', async (req, res) => {
     }
 });
 
+//Shipping API -------------------------------------------------------------------------------------------------------------------------
+
+
+
 // Dashboard API ------------------------------------------------------------------------------------------------------------------------
 
 app.get('/api/admindashboard/clientcount', async (req, res) => {
@@ -234,6 +238,15 @@ app.get('/api/admindashboard/suppliercount', async (req, res) => {
     try {
         const supplierCount = await SupplierModel.countDocuments();
         res.json({ count: supplierCount });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching supplier count', error: error.message });
+    }
+});
+
+app.get('/api/admindashboard/complientcount', async (req, res) => {
+    try {
+        const complientCount = await CustomersupportModel.countDocuments();
+        res.json({ count: complientCount });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching supplier count', error: error.message });
     }
