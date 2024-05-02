@@ -4,6 +4,8 @@ const cors = require('cors');
 const ClientModel = require('./models/Client'); 
 const SupplierModel = require('./models/Supplier');
 const CustomersupportModel = require('./models/Customersupport');
+const ShippingModel = require('./models/Shipping');
+const OrderModel = require('./models/Order');
 const { cookie } = require('express-validator');
 const UserModel = require('./models/Users')
 const cookieParser = require('cookie-parser');
@@ -44,7 +46,6 @@ app.post('/register',(req,res)=>{
 
 
 //Login
-
 
 app.post('/login', (req,res)=>{
     const {email,password} = req.body;
@@ -111,6 +112,10 @@ app.delete('/deleteTicket/:id', (req, res) => {
         .catch(err => res.json(err))
     });
 
+
+
+// Customer Support API END -------------------------------------------------------------------------------------------------------
+
 // Supplier API------------------------------------------------------------------------
 
 app.post('/CreateSupplier', async (req, res) => {
@@ -166,6 +171,8 @@ app.delete('/Deletesupplier', async (req, res) => {
 });
 
 
+// Supplier API END --------------------------------------------------------------------------------------------------------------
+
 // Client API --------------------------------------------------------------------------------------------------------------------
 
 app.get('/', async (req, res) => {
@@ -219,7 +226,114 @@ app.delete('/deleteClient/:id', async (req, res) => {
     }
 });
 
+
 //Shipping API -------------------------------------------------------------------------------------------------------------------------
+
+
+app.get('/sh',(req,res)=>{
+    ShippingModel.find({})
+    .then(Shipping => res.json(Shipping))
+    .catch(err => res.json(err))
+})
+
+app.post('/CreateShipping', (req, res) => {
+    ShippingModel.create(req.body)
+    .then(Shipping => res.json(Shipping))
+    .catch(err => res.json(err))
+});
+
+
+app.get('/getShipping/:id',(req,res)=>{
+    const id = req.params.id;
+    ShippingModel.findById({_id:id})
+    .then(Shipping => res.json(Shipping))
+    .catch(err => res.json(err))
+})
+
+
+app.put('/UpdateShipping/:id',(req,res)=>{
+    const id = req.params.id;
+    ShippingModel.findByIdAndUpdate({_id:id},{
+        shipmentId:req.body.shipmentId,
+        shippingType:req.body.shippingType,
+        email:req.body.email,
+        phone:req.body.phone,
+        zipCode:req.body.zipCode,
+        province:req.body.province,
+        hscode:req.body.hscode,
+        shippingStatus:req.body.shippingStatus,
+        shippeddat:req.body.shippeddat,
+        address:req.body.address,
+        cusName:req.body.cusName,
+        countryFrom:req.body.countryFrom,
+        countryTo:req.body.countryTo,
+        totalCost:req.body.totalCost
+    })
+    .then(Shipping => res.json(Shipping))
+    .catch(err => res.json(err))
+})
+
+app.delete('/deleteShipping/:id',(req,res)=>{
+    const id = req.params.id;
+    ShippingModel.findByIdAndDelete({_id:id})
+    .then(res => res.json(res))
+    .catch(err => res.json(err))
+})
+
+
+
+
+//Shipping API End ---------------------------------------------------------------------------------------------------------------------
+
+
+//Orders API Start-----------------------------------------------------------------------------------------------------------------------
+app.post("/CreateOrder", (req, res) => {
+    OrderModel.create(req.body)
+        .then(order => res.json(order))
+        .catch(err => res.json(err))
+});
+
+app.get('/getOrders', async (req, res) => {
+    try {
+        const order = await OrderModel.find({});
+        res.json(order);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching Orders', error: err.message });
+    }
+});
+
+app.get('/getOrder/:id', (req, res) => {
+    const id = req.params.id;
+    OrderModel.findById({_id: id})
+        .then(order => res.json(order))
+        .catch(err => res.json(err))
+});
+
+app.put('/UpdateOrder/:id', (req, res) => {
+    const id = req.params.id;
+    OrderModel.findByIdAndUpdate({_id: id}, {
+        orderId: req.body.ticketId,
+        productName:req.body.productName,
+        itemId: req.body.itemId,
+        quantity: req.body.quantity,
+        orderDate: req.body.orderDate,
+        amount: req.body.amount,
+    })
+        .then(order => res.json(order))
+        .catch(err => res.json(err))
+});
+
+app.delete('/deleteOrder/:id', (req, res) => {
+    const id = req.params.id;
+    OrderModel.findByIdAndDelete({_id: id})
+        .then(result => res.json(result))
+        .catch(err => res.json(err))
+    });
+
+
+//Orders API END-------------------------------------------------------------------------------------------------------------------------
+
+
 
 
 
@@ -247,6 +361,15 @@ app.get('/api/admindashboard/complientcount', async (req, res) => {
     try {
         const complientCount = await CustomersupportModel.countDocuments();
         res.json({ count: complientCount });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching supplier count', error: error.message });
+    }
+});
+
+app.get('/api/admindashboard/ordercount', async (req, res) => {
+    try {
+        const orderCount = await OrderModel.countDocuments();
+        res.json({ count: orderCount });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching supplier count', error: error.message });
     }
