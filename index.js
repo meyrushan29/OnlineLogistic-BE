@@ -7,6 +7,7 @@ const CustomersupportModel = require('./models/Customersupport');
 const ShippingModel = require('./models/Shipping');
 const OrderModel = require('./models/Order');
 const InventoryModel = require('./models/Inventory');
+const WarehouseModel = require('./models/WareHouse');
 const { cookie } = require('express-validator');
 const UserModel = require('./models/Users')
 const cookieParser = require('cookie-parser');
@@ -381,6 +382,59 @@ app.delete('/deleteOrder/:id', (req, res) => {
 
 //Orders API END-------------------------------------------------------------------------------------------------------------------------
 
+
+//WareHouse API START-------------------------------------------------------------------------------------------------------------------
+
+app.post("/Createwarehouse", (req, res) => {
+    WarehouseModel.create(req.body)
+        .then(warehouse => res.json(warehouse))
+        .catch(err => res.json(err))
+});
+
+
+app.get('/getwarehouse', async (req, res) => {
+    try {
+        const warehouse = await WarehouseModel.find({});
+        res.json(warehouse);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching Warehouse', error: err.message });
+    }
+});
+
+
+app.get('/getware/:id', (req, res) => {
+    const id = req.params.id;
+    WarehouseModel.findById({_id: id})
+        .then(warehouse => res.json(warehouse))
+        .catch(err => res.json(err))
+});
+
+
+app.put('/Updateware/:id', (req, res) => {
+    const id = req.params.id;
+    WarehouseModel.findByIdAndUpdate({_id: id}, {
+        warehouseId: req.body.warehouseId,
+        itemId:req.body.itemId,
+        arrivalDate: req.body.arrivalDate,
+        departureDate: req.body.departureDate,
+        address: req.body.address,
+    })
+        .then(warehouse => res.json(warehouse))
+        .catch(err => res.json(err))
+});
+
+
+app.delete('/deletewarehouse/:id', (req, res) => {
+    const id = req.params.id;
+    WarehouseModel.findByIdAndDelete({_id: id})
+        .then(result => res.json(result))
+        .catch(err => res.json(err))
+    });
+
+
+
+
+//WareHouse API END --------------------------------------------------------------------------------------------------------------------
 
 
 
