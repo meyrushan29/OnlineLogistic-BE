@@ -6,6 +6,7 @@ const SupplierModel = require('./models/Supplier');
 const CustomersupportModel = require('./models/Customersupport');
 const ShippingModel = require('./models/Shipping');
 const OrderModel = require('./models/Order');
+const InventoryModel = require('./models/Inventory');
 const WarehouseModel = require('./models/WareHouse');
 const { cookie } = require('express-validator');
 const UserModel = require('./models/Users')
@@ -286,7 +287,54 @@ app.delete('/deleteShipping/:id',(req,res)=>{
 
 //Shipping API End ---------------------------------------------------------------------------------------------------------------------
 
+//Inventory ---------------------------------------------------------------------------------------------------------
+app.post("/CreateInventory", (req, res) => {
+    InventoryModel.create(req.body)
+        .then(Inventory=> res.json(Inventory))
+        .catch(err => res.json(err))
+});
+app.get('/inv', async (req, res) => {
+    try {
+        const Inventory = await InventoryModel.find({});
+        res.json(Inventory);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching inventory', error: err.message });
+    }
+});
+app.get('/getInventory/:id', (req, res) => {
+    const id = req.params.id;
+    InventoryModel.findById({_id: id})
+        .then(Inventory => res.json(Inventory))
+        .catch(err => res.json(err))
+});
+/////////////////////////////////////////////////////////////
+app.delete('/deleteInventory/:id', async (req, res) => {
+    try {
+        await InventoryModel.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Inventory deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting Inventory', error: err.message });
+    }
+});
+/////////////////////////////////////////////////////////////////
+app.put('/UpdateInventory/:id', (req, res) => {
+    const id = req.params.id;
+    InventoryModel.findByIdAndUpdate({_id: id}, {
+        itemId: req.body.itemId,
+        name:req.body.name,
+        description: req.body.description,
+        price:req.body.price,
+        quantity: req.body.quantity,
+         
+    })
+        .then(Inventory => res.json(Inventory))
+        .catch(err => res.json(err))
+}
+);
 
+
+
+//Inventory end-------------------------------------------------------------------------------------------------------
 //Orders API Start-----------------------------------------------------------------------------------------------------------------------
 app.post("/CreateOrder", (req, res) => {
     OrderModel.create(req.body)
